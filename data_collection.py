@@ -8,9 +8,9 @@ def get_reviews(keyword):
     if not keyword:
         return pd.DataFrame({"text": []})
 
-    # -----------------------------
+ 
     # STEP 1: SEARCH PLACES
-    # -----------------------------
+
     search_url = "https://maps.googleapis.com/maps/api/place/textsearch/json"
 
     search_res = requests.get(search_url, params={
@@ -34,9 +34,8 @@ def get_reviews(keyword):
     print("\nPLACES FOUND:")
     print("-" * 50)
 
-    # -----------------------------
     # STEP 2: LOOP RESULTS
-    # -----------------------------
+
     for place in results:
 
         name = place.get("name", "Unknown")
@@ -48,9 +47,9 @@ def get_reviews(keyword):
         print(f"{address}")
         print(f"Rating: {rating}")
 
-        # -----------------------------
+
         # STEP 3: GET REVIEWS
-        # -----------------------------
+  
         reviews_url = "https://maps.googleapis.com/maps/api/place/details/json"
 
         details = requests.get(reviews_url, params={
@@ -61,25 +60,24 @@ def get_reviews(keyword):
 
         reviews = details.get("result", {}).get("reviews", [])
 
-        # -----------------------------
+  
         # CASE 1: REVIEWS FOUND
-        # -----------------------------
+ 
         if reviews:
             for r in reviews:
                 text = r.get("text")
                 if text:
                     all_text.append(text)
 
-        # -----------------------------
         # CASE 2: NO REVIEWS → FALLBACK
-        # -----------------------------
+
         else:
             fallback_text = f"{name} located at {address} has rating {rating}"
             all_text.append(fallback_text)
 
-    # -----------------------------
+
     # FINAL CHECK
-    # -----------------------------
+
     if not all_text:
         all_text.append("No review data available from Google API")
 
