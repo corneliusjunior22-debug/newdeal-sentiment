@@ -8,7 +8,7 @@ from src.train_model import train
 
 st.title("New Deal Motors Sentiment Dashboard (Waterloo, IA)")
 
-if st.button("Load Latest Reviews + Tweets"):
+if st.button("Load Latest Reviews"):
     df = get_all_data()
 
     df["clean"] = df["text"].apply(clean_text)
