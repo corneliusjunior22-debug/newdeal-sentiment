@@ -1,15 +1,5 @@
 import streamlit as st
 import pandas as pd
-import sys
-import os
-
-# FIX PATH (Streamlit safe)
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(BASE_DIR)
-
-
-# IMPORT MODULES (NO src/)
 
 from data_collection import get_reviews
 from preprocessing import clean_text
@@ -23,16 +13,13 @@ from nltk.sentiment import SentimentIntensityAnalyzer
 nltk.download("vader_lexicon")
 sia = SentimentIntensityAnalyzer()
 
-
-# UI CONFIG
-
-st.set_page_config(page_title="Brand Sentiment Analysis", layout="wide")
-st.title("Google Reviews Sentiment Dashboard")
+st.set_page_config(page_title="Sentiment Dashboard", layout="wide")
+st.title("Google Reviews Sentiment Analysis")
 
 
-
-# SENTIMENT FUNCTION (NO FAKE LABELS)
-
+# -----------------------------
+# SENTIMENT FUNCTION
+# -----------------------------
 def get_sentiment(text):
     score = sia.polarity_scores(text)["compound"]
 
@@ -43,71 +30,55 @@ def get_sentiment(text):
     return "neutral"
 
 
+# -----------------------------
+# USER INPUT
+# -----------------------------
+keyword = st.text_input("Enter business name or keyword")
 
-# USER INPUT (KEYWORD SEARCH)
+if st.button("Analyze"):
 
-keyword = st.text_input("Enter Business / Brand Name (e.g. New Deal Motors Waterloo Iowa)")
-
-if st.button("Analyze Reviews"):
-
-    if not keyword:
-        st.error("Please enter a search term.")
-        st.stop()
-
-    # STEP 1: GET GOOGLE REVIEWS
     df = get_reviews(keyword)
 
-    if df is None or df.empty:
-        st.error("No reviews found for this search term.")
+    if df.empty:
+        st.error("No data found")
         st.stop()
 
-    # STEP 2: CLEAN TEXT
+    # CLEAN TEXT
     df["clean"] = df["text"].fillna("").apply(clean_text)
+
+    # REMOVE EMPTY ROWS
     df = df[df["clean"].str.strip() != ""]
 
     if df.empty:
-        st.error("No usable text after cleaning.")
+        st.error("No usable text after cleaning")
         st.stop()
 
-    # STEP 3: SENTIMENT LABELS (VADER)
+    # SENTIMENT LABELS (VADER)
     df["sentiment"] = df["clean"].apply(get_sentiment)
 
-    # STEP 4: FEATURE ENGINEERING (TF-IDF)
+    # FEATURES
     X = fit_transform(df["clean"])
     y = df["sentiment"]
 
-    # STEP 5: TRAIN MODEL
+    # TRAIN MODEL
     model = train(X, y)
 
-    # STEP 6: PREDICTIONS
+    # PREDICTIONS
     df["prediction"] = model.predict(X)
 
-   
-    # DASHBOARD OUTPUT
-
-
-    st.subheader("Review Data")
+    # -----------------------------
+    # UI OUTPUT
+    # -----------------------------
+    st.subheader("Data")
     st.dataframe(df)
 
-    st.subheader("Sentiment Breakdown")
+    st.subheader("Sentiment Distribution")
     st.bar_chart(df["sentiment"].value_counts())
 
-    st.subheader("Model Predictions")
+    st.subheader("Predictions")
     st.bar_chart(df["prediction"].value_counts())
 
-    # TREND ANALYSIS
-
+    st.subheader("Trend")
     df["index"] = range(len(df))
     trend = df.groupby(["index", "sentiment"]).size().unstack().fillna(0)
-
-    st.subheader("Sentiment Trend")
     st.line_chart(trend)
-
-    # DOWNLOAD DATA
-
-    st.download_button(
-        "Download Results",
-        df.to_csv(index=False),
-        "sentiment_results.csv",
-        "text/csv"
-    )
