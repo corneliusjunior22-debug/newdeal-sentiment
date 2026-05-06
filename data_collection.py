@@ -15,16 +15,15 @@ def get_reviews(keyword):
 
     search_url = "https://maps.googleapis.com/maps/api/place/textsearch/json"
 
-    search_res = requests.get(search_url, params={
-        "query": keyword,
-        "key": GOOGLE_API_KEY
-    }).json()
+  search_res = requests.get(search_url, params={
+    "query": keyword,
+    "key": GOOGLE_API_KEY
+}).json()
 
-    results = search_res.get("results", [])
+print("\nRAW RESPONSE:")
+print(search_res)
 
-    print("\n GOOGLE RESULTS RAW OUTPUT:")
-    print(search_res)
-
+print("\nSTATUS:", search_res.get("status"))
     if not results:
         print("No places found at all")
         return pd.DataFrame({"text": []})
