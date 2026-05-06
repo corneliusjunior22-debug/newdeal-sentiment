@@ -2,7 +2,7 @@ import requests
 import tweepy
 import pandas as pd
 
-GOOGLE_API_KEY = "YOUR_GOOGLE_API_KEY"
+GOOGLE_API_KEY = "AIzaSyBA_P9fZ8prDUsRLN4WxcNfUpOwfp5PKk8"
 TWITTER_BEARER = "YOUR_TWITTER_BEARER_TOKEN"
 
 
