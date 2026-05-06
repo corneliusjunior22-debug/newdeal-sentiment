@@ -4,18 +4,13 @@ import sys
 import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-SRC_PATH = os.path.join(BASE_DIR, "src")
+sys.path.append(BASE_DIR)
 
-sys.path.append(SRC_PATH)
-
-# ensure src is accessible
-sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
-
-from data_collection import get_all_data
-from preprocessing import clean_text
-from feature_engineering import fit_transform
-from train_model import train
-from evaluate import evaluate
+from src.data_collection import get_all_data
+from src.preprocessing import clean_text
+from src.feature_engineering import fit_transform
+from src.train_model import train
+from src.evaluate import evaluate
 
 import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
