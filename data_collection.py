@@ -4,29 +4,55 @@ import pandas as pd
 GOOGLE_API_KEY = "AIzaSyBA_P9fZ8prDUsRLN4WxcNfUpOwfp5PKk8"
 
 
+# GET GOOGLE REVIEWS BY KEYWORD
+
 def get_reviews(keyword):
-    url = "https://maps.googleapis.com/maps/api/place/textsearch/json"
+    """
+    Fetch Google Places reviews based on a search keyword.
+    Example: "New Deal Motors Waterloo Iowa"
+    """
 
-    res = requests.get(url, params={
-        "query": keyword,
-        "key": GOOGLE_API_KEY
-    }).json()
-
-    if "results" not in res or len(res["results"]) == 0:
+    if not keyword:
         return pd.DataFrame({"text": []})
 
-    place_id = res["results"][0]["place_id"]
+    try:
+        # STEP 1: SEARCH PLACE
+        search_url = "https://maps.googleapis.com/maps/api/place/textsearch/json"
 
-    details_url = "https://maps.googleapis.com/maps/api/place/details/json"
+        search_res = requests.get(search_url, params={
+            "query": keyword,
+            "key": GOOGLE_API_KEY
+        }).json()
 
-    details = requests.get(details_url, params={
-        "place_id": place_id,
-        "fields": "reviews",
-        "key": GOOGLE_API_KEY
-    }).json()
+        results = search_res.get("results", [])
 
-    reviews = details.get("result", {}).get("reviews", [])
+        if not results:
+            return pd.DataFrame({"text": []})
 
-    texts = [r["text"] for r in reviews]
+        place_id = results[0].get("place_id")
 
-    return pd.DataFrame({"text": texts})
+        if not place_id:
+            return pd.DataFrame({"text": []})
+
+        # STEP 2: GET REVIEWS
+        details_url = "https://maps.googleapis.com/maps/api/place/details/json"
+
+        details_res = requests.get(details_url, params={
+            "place_id": place_id,
+            "fields": "reviews",
+            "key": GOOGLE_API_KEY
+        }).json()
+
+        reviews = details_res.get("result", {}).get("reviews", [])
+
+        if not reviews:
+            return pd.DataFrame({"text": []})
+
+        # STEP 3: EXTRACT TEXT
+        texts = [r.get("text", "") for r in reviews if r.get("text")]
+
+        return pd.DataFrame({"text": texts})
+
+    except Exception as e:
+        print("Error fetching reviews:", e)
+        return pd.DataFrame({"text": []})
