@@ -2,16 +2,14 @@ import streamlit as st
 import pandas as pd
 import sys
 import os
-st.write(os.listdir())
-st.write(os.listdir("src"))
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 
-from src.data_collection import get_all_data
-from src.preprocessing import clean_text
-from src.feature_engineering import fit_transform
-from src.train_model import train
-from src.evaluate import evaluate
+from data_collection import get_all_data
+from preprocessing import clean_text
+from feature_engineering import fit_transform
+from train_model import train
+from evaluate import evaluate
 
 st.title("New Deal Motors Sentiment Dashboard (Waterloo, IA)")
 
