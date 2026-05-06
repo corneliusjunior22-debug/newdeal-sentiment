@@ -1,9 +1,5 @@
-pandas
-numpy
-scikit-learn
-matplotlib
-seaborn
-requests
-nltk
 streamlit
-tweepy
+pandas
+requests
+scikit-learn
+nltk
