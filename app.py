@@ -17,9 +17,8 @@ st.set_page_config(page_title="Sentiment Dashboard", layout="wide")
 st.title("Google Reviews Sentiment Analysis")
 
 
-# -----------------------------
 # SENTIMENT FUNCTION
-# -----------------------------
+
 def get_sentiment(text):
     score = sia.polarity_scores(text)["compound"]
 
@@ -30,9 +29,8 @@ def get_sentiment(text):
     return "neutral"
 
 
-# -----------------------------
 # USER INPUT
-# -----------------------------
+
 keyword = st.text_input("Enter business name or keyword")
 
 if st.button("Analyze"):
@@ -66,9 +64,8 @@ if st.button("Analyze"):
     # PREDICTIONS
     df["prediction"] = model.predict(X)
 
-    # -----------------------------
     # UI OUTPUT
-    # -----------------------------
+
     st.subheader("Data")
     st.dataframe(df)
 
